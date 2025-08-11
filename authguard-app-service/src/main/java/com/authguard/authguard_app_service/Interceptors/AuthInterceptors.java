@@ -13,13 +13,43 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Interceptor for extracting and validating the user ID from incoming HTTP
+ * requests.
+ *
+ * <p>
+ * This interceptor checks for the presence of the {@code X-USER-Id} HTTP header
+ * before the request reaches the controller layer. If found, the user ID is
+ * stored
+ * in {@link UserContext} (ThreadLocal) for downstream use in the current
+ * request.
+ * </p>
+ *
+ * <p>
+ * If the header is missing or invalid, the request is rejected with an
+ * exception.
+ * </p>
+ *
+ * <p>
+ * The stored user ID is cleared after the request is processed to avoid
+ * ThreadLocal memory leaks.
+ * </p>
+ */
+
 @Slf4j
 @Component
 public class AuthInterceptors implements HandlerInterceptor {
-
+    /**
+     * Extracts {@code X-USER-Id} from the request header and stores it in the
+     * UserContext.
+     *
+     * @return {@code true} if request should proceed, otherwise throws an exception
+     * @throws Exception if the {@code X-USER-Id} header is missing or invalid
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
+
         log.info("pre handling : {} " + request.getRequestURI());
         String userId = request.getHeader("X-USER-Id");
         if (userId == null) {
@@ -29,6 +59,9 @@ public class AuthInterceptors implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * Clears the UserContext after request processing is complete.
+     */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
             @Nullable ModelAndView modelAndView) throws Exception {
