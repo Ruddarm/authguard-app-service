@@ -53,7 +53,7 @@ public class AuthInterceptors implements HandlerInterceptor {
         log.info("pre handling : {} " + request.getRequestURI());
         String userId = request.getHeader("X-USER-Id");
         if (userId == null) {
-            throw new Exception("Invlid user Id");
+            throw new Exception("Invlid user Id "+userId);
         }
         UserContext.setUserId(UUID.fromString(userId));
         return true;
