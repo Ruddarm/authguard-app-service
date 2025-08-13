@@ -8,12 +8,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+
 /*
  * Central Spring Configuration class that define infratsturre realted beans for
  * authgurad-app-service
@@ -29,16 +31,21 @@ import org.springframework.security.web.SecurityFilterChain;
 public class config {
 
     /*
-     * Provides a ModelMapper bean for object-to-object mapping between entities and DTOs
+     * Provides a ModelMapper bean for object-to-object mapping between entities and
+     * DTOs
+     * 
      * @return new modelMapper Instance
      */
     @Bean
     public ModelMapper getModelMapper() {
         return new ModelMapper();
     }
+
     /*
-     * Provide a configured redis {@link CacheManager} 
+     * Provide a configured redis {@link CacheManager}
+     * 
      * @param RedisConnectionFactory connectionFactory
+     * 
      * @return the configue cache manager
      * 
      */
@@ -53,6 +60,7 @@ public class config {
                 .cacheDefaults(RedisCacheConfiguration.defaultCacheConfig())
                 .withInitialCacheConfigurations(cacheMangaer).build();
     }
+
     /**
      * Configures Spring Security to disable CORS and CSRF protection,
      * and permit all incoming HTTP requests without authentication.
@@ -62,11 +70,26 @@ public class config {
      * @throws Exception if an error occurs during configuration
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors(cors -> cors.disable())
+    @Order(2)
+    SecurityFilterChain globalFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.securityMatcher("/").cors(cors -> cors.disable())
                 .csrf(crsf -> crsf.disable())
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return httpSecurity.build();
+    }
+
+    @Bean
+    @Order(1)
+    SecurityFilterChain interServiceFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.securityMatcher("/service/**").cors(cors -> cors.disable())
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        return httpSecurity.build();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 
 }

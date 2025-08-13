@@ -2,6 +2,7 @@ package com.authguard.authguard_app_service.services;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,16 +20,19 @@ import lombok.RequiredArgsConstructor;
 /**
  * Service layer for handling application-related operations.
  *
- * <p>This class provides methods to:
+ * <p>
+ * This class provides methods to:
  * <ul>
- *   <li>Create new applications for the logged-in user</li>
- *   <li>Retrieve an application by its client ID (with caching)</li>
- *   <li>Fetch all applications for the current user (with caching)</li>
+ * <li>Create new applications for the logged-in user</li>
+ * <li>Retrieve an application by its client ID (with caching)</li>
+ * <li>Fetch all applications for the current user (with caching)</li>
  * </ul>
  * </p>
  *
- * <p>Uses {@link UserContext} to determine the user making the request.
- * Uses Redis caching for performance optimization.</p>
+ * <p>
+ * Uses {@link UserContext} to determine the user making the request.
+ * Uses Redis caching for performance optimization.
+ * </p>
  */
 @Service
 @RequiredArgsConstructor
@@ -40,8 +44,10 @@ public class AppService {
     /**
      * Creates a new application for the currently authenticated user.
      *
-     * <p>Generates a random client secret and assigns the current user's ID
-     * from {@link UserContext}.</p>
+     * <p>
+     * Generates a random client secret and assigns the current user's ID
+     * from {@link UserContext}.
+     * </p>
      *
      * @param appRequest DTO containing the application name
      * @return the created application's details
@@ -67,7 +73,9 @@ public class AppService {
     /**
      * Retrieves an application by its client ID.
      * 
-     * <p>Result is cached in Redis under {@code appById}.</p>
+     * <p>
+     * Result is cached in Redis under {@code appById}.
+     * </p>
      *
      * @param client_Id the UUID of the application
      * @return application details as {@link AppResponse}
@@ -83,14 +91,18 @@ public class AppService {
     /**
      * Retrieves all applications for the current user.
      * 
-     * <p>Result is cached in Redis under {@code appListByUser} 
-     * using {@code userContextKeyGenerator}.</p>
+     * <p>
+     * Result is cached in Redis under {@code appListByUser}
+     * using {@code userContextKeyGenerator}.
+     * </p>
      *
      * @return list of {@link AppResponse} for the user
      */
     @Cacheable(cacheNames = "appListByUser", keyGenerator = "userContextKeyGenerator")
     public List<AppResponse> getAppList() {
         UUID userId = UserContext.getUserId();
-        return appRepository.findAppListByUserId(userId);
+        return appRepository.findByUserId(userId).stream()
+                .map(appEntity -> modelMapper.map(appEntity, AppResponse.class))
+                .collect(Collectors.toList());
     }
 }
