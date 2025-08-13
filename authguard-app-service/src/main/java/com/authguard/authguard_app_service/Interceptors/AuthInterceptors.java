@@ -49,11 +49,12 @@ public class AuthInterceptors implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-
-        log.info("pre handling : {} " + request.getRequestURI());
+        log.info("pre handling : {} ", request.getRequestURI());
+        if (request.getRequestURI().startsWith("/service"))
+            return true;
         String userId = request.getHeader("X-USER-Id");
         if (userId == null) {
-            throw new Exception("Invlid user Id "+userId);
+            throw new Exception("Invlid user Id " + userId);
         }
         UserContext.setUserId(UUID.fromString(userId));
         return true;
@@ -67,7 +68,7 @@ public class AuthInterceptors implements HandlerInterceptor {
             @Nullable ModelAndView modelAndView) throws Exception {
 
         UserContext.clear();
-        log.info("post handling : {} " + request.getRequestURI());
+        log.info("post handling : {} ", request.getRequestURI());
 
     }
 }

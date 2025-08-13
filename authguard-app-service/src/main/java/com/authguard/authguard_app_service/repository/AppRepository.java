@@ -3,14 +3,14 @@ package com.authguard.authguard_app_service.repository;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+// import org.springframework.data.jpa.repository.Query;
+// import org.springframework.data.repository.query.Param;
 
 import com.authguard.authguard_app_service.model.entity.AppEntity;
 
 import java.util.List;
 
-import com.authguard.authguard_app_service.dtos.AppResponse;
+// import com.authguard.authguard_app_service.dtos.AppResponse;
 
 
 public interface AppRepository extends  JpaRepository<AppEntity, UUID> {

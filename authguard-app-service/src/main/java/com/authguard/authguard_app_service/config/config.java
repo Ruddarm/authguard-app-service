@@ -61,31 +61,7 @@ public class config {
                 .withInitialCacheConfigurations(cacheMangaer).build();
     }
 
-    /**
-     * Configures Spring Security to disable CORS and CSRF protection,
-     * and permit all incoming HTTP requests without authentication.
-     *
-     * @param httpSecurity the HttpSecurity object to configure
-     * @return the configured SecurityFilterChain
-     * @throws Exception if an error occurs during configuration
-     */
-    @Bean
-    @Order(2)
-    SecurityFilterChain globalFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.securityMatcher("/").cors(cors -> cors.disable())
-                .csrf(crsf -> crsf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-        return httpSecurity.build();
-    }
 
-    @Bean
-    @Order(1)
-    SecurityFilterChain interServiceFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.securityMatcher("/service/**").cors(cors -> cors.disable())
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
-        return httpSecurity.build();
-    }
 
     @Bean
     public ModelMapper modelMapper() {
