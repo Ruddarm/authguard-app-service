@@ -82,7 +82,6 @@ public class AppController {
         }
         return ResponseEntity.ok(appResponse);
     }
-
     /*
      * A Get route to fethc the list of app
      * 

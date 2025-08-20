@@ -21,6 +21,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable());
     }
 
+    /**
+     * Configures Spring Security to disable CORS and CSRF protection,
+     * and permit all incoming HTTP requests without authentication.
+     *
+     * @param httpSecurity the HttpSecurity object to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     @Order(2) // Inter-service first
     public SecurityFilterChain interServiceFilterChain(HttpSecurity http) throws Exception {
